@@ -42,13 +42,10 @@ void calque::sort()
     std::sort(busy.begin(), busy.end());
 }
 
-
 void calque::set_etat(unsigned int x, unsigned int y, etat val)
 {
-    vector<cellule>::iterator it;
+    vector<cellule>::iterator it = find(busy.begin(), busy.end(), cellule(x, y));
 
-    espace<etat>::set_etat(x, y, val);
-    it = find(busy.begin(), busy.end(), cellule(x, y));
     if(it == busy.end())
     {
 	if(val == plein)
@@ -61,6 +58,7 @@ void calque::set_etat(unsigned int x, unsigned int y, etat val)
     }
 
     sort();
+    espace<etat>::set_etat(x, y, val);
 }
 
 void calque::clear(etat val)
