@@ -16,9 +16,9 @@ public:
 	    const vector<calque_set> & config);
 
     bool all_placed() { return avail.size() == 0; };
-    void find_candidates(vector<ensemble> & dispo);
-    bool push_candidate(const ensemble & candid);
-    void pop_candidate(const ensemble & candid);
+    void find_candidates(vector<candidate> & dispo);
+    bool push_candidate(const candidate & candid);
+    void pop_candidate(const candidate & candid);
 
     board current;
 private:

@@ -11,10 +11,10 @@ travail::travail(unsigned int dimx,
 }
 
 
-void travail::find_candidates(vector<ensemble> & dispo)
+void travail::find_candidates(vector<candidate> & dispo)
 {
     signed int free_x, free_y;
-    ensemble tmp;
+    candidate tmp;
 
     dispo.clear();
 
@@ -45,7 +45,7 @@ void travail::find_candidates(vector<ensemble> & dispo)
 }
 
 
-bool travail::push_candidate(const ensemble & candid)
+bool travail::push_candidate(const candidate & candid)
 {
     assert(candid.busy_cellules != nullptr);
     if(current.add(*(candid.busy_cellules), candid.symbol))
@@ -60,7 +60,7 @@ bool travail::push_candidate(const ensemble & candid)
 	return false;
 }
 
-void travail::pop_candidate(const ensemble & candid)
+void travail::pop_candidate(const candidate & candid)
 {
     assert(candid.busy_cellules != nullptr);
     avail.push_back(candid.calque_set_index);

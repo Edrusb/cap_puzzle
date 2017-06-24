@@ -49,7 +49,7 @@ static void resout(travail & work,
 		   resultat & solutions,
 		   unsigned int level)
 {
-    vector<ensemble> dispo;
+    vector<candidate> dispo;
 
 	// verification qu'il reste encore des pieces a mettre
 

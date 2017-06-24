@@ -8,7 +8,7 @@ using namespace std;
 
     /// holds information about the a calque to try in order to fill a hole
 
-struct ensemble
+struct candidate
 {
     unsigned int calque_set_index;          //< index of the piece the calque is taken from
     const vector<cellule> * busy_cellules;  //< list of cells occupied by the piece in that position
