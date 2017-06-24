@@ -29,5 +29,5 @@ calque.hpp: espace.hpp etat.hpp
 pieces.hpp: erreurs.hpp etat.hpp espace.hpp
 board.hpp: espace.hpp calque.hpp erreurs.hpp rotation.hpp
 position.hpp: rotation.hpp
-calque.hpp: espace.hpp etat.hpp
+calque.hpp: espace.hpp etat.hpp cellule.hpp
 espace.hpp: erreurs.hpp fd_tools.hpp

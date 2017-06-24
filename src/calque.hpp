@@ -4,18 +4,10 @@
 #include <vector>
 #include "espace.hpp"
 #include "etat.hpp"
+#include "cellule.hpp"
 
 using namespace std;
 
-struct cellule
-{
-    cellule(unsigned int vx, unsigned int vy) { x = vx; y = vy; };
-
-    unsigned int x;
-    unsigned int y;
-    bool operator < (const cellule & ref) const { return x < ref.x || (x == ref.x && y < ref.y); };
-    bool operator == (const cellule & ref) const { return x == ref.x && y == ref.y; };
-};
 
 class calque : public espace<etat>
 {
