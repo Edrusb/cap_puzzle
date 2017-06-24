@@ -61,7 +61,8 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
     }
 
 
-	// recherche d'une place libre (une seule suffit) à remplir dans le tableau en cours (si plus de place libre -> pas de solution au problème)
+	// recherche d'une place libre (une seule suffit) à remplir dans le tableau en cours
+	// (si plus de place libre -> pas de solution au problème)
 
     if(!current.find_free_space(free_x, free_y))
 	throw E_IMPOSSIBLE; // tout l'espace est utilise pourtant il reste des pieces a ajouter !
