@@ -1,8 +1,8 @@
 #CXXFLAGS = -O3 -DNDEBUG -std=c++11
-#CXXFLAGS = -O2 -DNDEBUG -pg
-CXXFLAGS = -g -pedantic -pg -std=c++11
-#LDFLAGS = -O3
-#LDFLAGS = -O2 -pg
+#CXXFLAGS = -O2 -DNDEBUG -std=c++11 -pg
+CXXFLAGS = -g -pedantic -std=c++11 -pg
+#LDFLAGS = -O3 -std=c++11
+#LDFLAGS = -O2 -std=c++11 -pg
 LDFLAGS = -g
 
 OBJ=puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o
