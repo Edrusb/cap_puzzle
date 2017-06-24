@@ -7,10 +7,14 @@
 #include "calque.hpp"
 #include "position.hpp"
 
+    /// set of calques each containing a possible position if the gven piece in a board of given dimensions
+
 class calque_set
 {
 public:
-    calque_set(const piece & p, unsigned int x, unsigned int y);
+    calque_set(const piece & p, //< piece de base pour le jeu de calques
+	       unsigned int x,  //< dimensions du tableau dans lequel doit etre placee la pice
+	       unsigned int y); //< dimensions du tableau dans lequel doit etre placee la pice
 
     const calque & read_calque(unsigned int x) const;
     unsigned int get_total_num() const { return possible.size(); }

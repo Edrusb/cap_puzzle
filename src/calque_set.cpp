@@ -79,7 +79,7 @@ bool calque_set::update_calque_with(const piece & p, const position & pos, calqu
 		register signed int b_y = pos.loc_y + a2*x + b2*y;
 
 		if(b_x < 0 || b_y < 0 || b_x >= result.get_size_x() || b_y >= result.get_size_y())
-		    conflict = true;
+		    conflict = true; // la piece sort du cadre apres la transformation "pos"
 		else
 		    result.set_etat(b_x, b_y, plein);
  	    }
