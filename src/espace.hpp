@@ -10,6 +10,7 @@ using namespace std;
 #include "erreurs.hpp"
 #include "fd_tools.hpp"
 
+    /// manages a rectangular table which base type is T
 
 template <class T> class espace
 {
