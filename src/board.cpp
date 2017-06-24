@@ -53,7 +53,6 @@ bool board::find_free_space(signed int & x, signed int & y) const
     register signed int max_x = get_size_x();
     register signed int min_y = 0;
     register signed int max_y = get_size_y();
-    bool found = false;
 
 	// on cherche le long du bord et on tourne vers le centre.
 
@@ -64,7 +63,7 @@ bool board::find_free_space(signed int & x, signed int & y) const
 		// en haut
 	    x = min_x + 1;
 	    y = min_y;
-	    while(!found && x < max_x)
+	    while(x < max_x)
 		if(get_etat(x, y) == empty)
 		    throw true;
 		else
@@ -73,7 +72,7 @@ bool board::find_free_space(signed int & x, signed int & y) const
 		//  a droite
 	    x = max_x - 1;
 	    y++;
-	    while(!found && y < max_y)
+	    while(y < max_y)
 		if(get_etat(x, y) == empty)
 		    throw true;
 		else
@@ -82,7 +81,7 @@ bool board::find_free_space(signed int & x, signed int & y) const
 		// en bas
 	    x--;
 	    y = max_y - 1;
-	    while(!found && x >= min_x)
+	    while(x >= min_x)
 		if(get_etat(x, y) == empty)
 		    throw true;
 		else
@@ -91,7 +90,7 @@ bool board::find_free_space(signed int & x, signed int & y) const
 		// a gauche
 	    x = min_x;
 	    y--;
-	    while(!found && y >= min_y)
+	    while(y >= min_y)
 		if(get_etat(x, y) == empty)
 		    throw true;
 		else
