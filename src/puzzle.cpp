@@ -9,16 +9,40 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
-struct in_place
+    /// holds information about the a calque to try in order to fill a hole
+struct ensemble
 {
-    unsigned int calque_set_num;
-    unsigned int calque_num;
+    unsigned int calque_set_index;         //< index of the piece the calque is taken from
+    const vector <cellule> *busy_cellules; //< list of cells occupied by the piece in that position
+    unsigned char symbol;                  //< symbol of the piece
 };
 
+static void init_resout(const list<piece> & pi,             //< list of piece to play with
+			unsigned int dimx,                  //< dimension of the board
+			unsigned int dimy,                  //< dimension of the board
+			vector<calque_set> & configuration, //< set of all valid calques derived from each piece
+			vector<unsigned int> & avail,
+			vector<board> & solutions);         //< reset the list of solutions to empty list
+static void resout(board & current,                         //< current board under resolution
+		   const vector<calque_set> & configuration,//< claque of all possible pieces positions
+		   vector<unsigned int> & avail,            //< list if pieces not yet placed on the board
+		   vector<board> & solutions,               //< record of all completed solution found so far
+		   unsigned int level);                     //< recursion level
+static bool read_from_file(const char *name, list<piece> & disponibles, unsigned int & x, unsigned int & y);
+static void display_time(const string & message);
+static void display_solutions(const vector<board> & filtred_solutions);
+static void debug_piece(const list<piece> & disponibles);
+static void display_usage(const char *cmd);
+static vector<board> remove_dup(const vector<board> & solutions);
 
-void init_resoud2(list<piece> pi, unsigned int dimx, unsigned int dimy,  vector<calque_set> & configuration, vector<unsigned int> & avail, vector<board> & solutions)
+static void init_resout(const list<piece> & pi,
+			unsigned int dimx,
+			unsigned int dimy,
+			vector<calque_set> & configuration,
+			vector<unsigned int> & avail,
+			vector<board> & solutions)
 {
-    list<piece>::iterator it = pi.begin();
+    list<piece>::const_iterator it = pi.begin();
 
     configuration.clear();
     while(it != pi.end())
@@ -36,14 +60,11 @@ void init_resoud2(list<piece> pi, unsigned int dimx, unsigned int dimy,  vector<
     solutions.clear();
 }
 
-struct ensemble
-{
-    unsigned int calque_set_index;
-    const vector <cellule> *busy_cellules;
-    unsigned char symbol;
-};
-
-void resoud2(board & current, const vector<calque_set> & configuration, vector<unsigned int> & avail, vector<board> & solutions, unsigned int level)
+static void resout(board & current,
+		   const vector<calque_set> & configuration,
+		   vector<unsigned int> & avail,
+		   vector<board> & solutions,
+		   unsigned int level)
 {
     signed int free_x, free_y;
     vector<ensemble> dispo;
@@ -54,6 +75,7 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
     if(avail.size() == 0)
     {
 	time_t now = time(nullptr);
+
 	solutions.push_back(current);
 	cout << "Solution " << solutions.size() << " trouvee le " << ctime(&now);
 	cout.flush();
@@ -66,7 +88,6 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
 
     if(!current.find_free_space(free_x, free_y))
 	throw E_IMPOSSIBLE; // tout l'espace est utilise pourtant il reste des pieces a ajouter !
-
 
 
 	// recherche des calques disponibles pour les pièces non utilisées
@@ -88,7 +109,7 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
     }
 
 
-	// pour chaque calque, insertion du calque, mise à jour des used/no_used, recursion, suppression du calque
+	// pour chaque calque, insertion du calque, mise a jour des used/no_used, recursion, suppression du calque
 
     for(register unsigned int ca = 0 ; ca < dispo.size(); ca++)
     {
@@ -96,7 +117,7 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
 	if(current.add(*dispo[ca].busy_cellules, dispo[ca].symbol))
 	{
 	    vector<unsigned int>::iterator it = find(avail.begin(), avail.end(), dispo[ca].calque_set_index);
-
+/*
 #ifndef NDEBUG
 	    if(level <= 3)
 	    {
@@ -104,10 +125,11 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
 		cout << "[level " << level << "]  " << ca+1 << " / " << dispo.size() << " : " << ctime(&now) << endl;
 	    }
 #endif
+*/
 	    if(it == avail.end())
 		E_BUG;
 	    avail.erase(it);
-	    resoud2(current, configuration, avail, solutions, level+1); // recursion
+	    resout(current, configuration, avail, solutions, level+1); // recursion
 	    avail.push_back(dispo[ca].calque_set_index);
 	    current.remove(*dispo[ca].busy_cellules, dispo[ca].symbol);
 	}
@@ -116,7 +138,7 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
 }
 
 
-bool read_from_file(const char *name, list<piece> & disponibles, unsigned int & x, unsigned int & y)
+static bool read_from_file(const char *name, list<piece> & disponibles, unsigned int & x, unsigned int & y)
 {
 
 	// ouverture du fichier
@@ -151,97 +173,123 @@ bool read_from_file(const char *name, list<piece> & disponibles, unsigned int & 
     return true;
 }
 
+static void display_time(const string & message)
+{
+    time_t now = time(nullptr);
+    string heure = ctime(&now);
+
+    heure = heure.substr(0, heure.size()-1);
+    cout << heure << " : " << message << endl;
+    cout.flush();
+}
+
+static void display_solutions(const vector<board> & filtred_solutions)
+{
+    vector<board>::const_reverse_iterator it = filtred_solutions.rbegin();
+
+    while(it != filtred_solutions.rend())
+    {
+	cout << endl;
+	it->affiche();
+	++it;
+    }
+    cout << endl;
+}
+
+static void debug_piece(const list<piece> & disponibles)
+{
+#ifndef NDEBUG
+
+	// affichage des pieces utilisees
+
+    cout << "------------" << endl;
+    for(list<piece>::const_iterator it = disponibles.begin(); it != disponibles.end(); it++)
+    {
+	it->affiche();
+	cout << "------------" << endl;
+    }
+
+#endif
+}
+
+static void display_usage(const char *cmd)
+{
+    cout << "usage: " << cmd << " <fichier>" << endl << endl;
+    cout << "\t syntaxe du fichier attendu :" << endl;
+    cout << "\t[dimx, dimy]" << endl;
+    cout << "\t(x,y)[S] \n\t 1 0 0 ... \n\t 0 0 1 ... \n\t ... \n\n";
+    cout << "\tdimx et dimy sont les dimensions du tableau\n";
+    cout << "\tx et y sont les dimensions de la piece S son symbole et les 0 et 1 qui suivent sa forme (0 = vide, 1 = plein)\n";
+    cout << "\td'autres pièces peuvent être décrites selon le même schema, on peut insérer des espace ou l'on veut\n";
+}
+
+static vector<board> remove_dup(const vector<board> & solutions)
+{
+    vector<board> ret;
+
+    for(unsigned int src = 0; src < solutions.size() ; src++)
+    {
+	unsigned int dst = src+1;
+	while(dst < solutions.size() && !solutions[src].similaire(solutions[dst]))
+	    dst++;
+	if(dst >= solutions.size()) // dernier element de l'ensemble de solutions similaires
+	    ret.push_back(solutions[src]);
+    }
+
+    return ret;
+}
+
 int main(int argc, char *argv[])
 {
     if(argc != 2)
     {
-	cout << "usage: " << argv[0] << " <fichier>" << endl << endl;
-	cout << "\t syntaxe du fichier attendu :" << endl;
-	cout << "\t[dimx, dimy]" << endl;
-	cout << "\t(x,y)[S] \n\t 1 0 0 ... \n\t 0 0 1 ... \n\t ... \n\n";
-	cout << "\tdimx et dimy sont les dimensions du tableau\n";
-	cout << "\tx et y sont les dimensions de la piece S son symbole et les 0 et 1 qui suivent sa forme (0 = vide, 1 = plein)\n";
-	cout << "\td'autres pièces peuvent être décrites selon le même schema, on peut insérer des espace ou l'on veut\n";
+	display_usage(argv[0]);
 	exit(1);
     }
 
     try
     {
 	list<piece> disponibles;
-	vector<board> solutions;
-	vector<board> filtred_solutions;
 	unsigned int dimx, dimy;
 
-	    // lecture du fichier de configuration (-> disponibles, dimx, dimy, board)
-
 	cout  << "Lecture du fichier de configuration..." << endl;
-	cout.flush();
 	if(!read_from_file(argv[1], disponibles, dimx, dimy))
 	    exit(2);
-	board socle(dimx, dimy, '.');
-	cout << "Configuration correcte" << endl;
-
-#ifndef NDEBUG
-
-	    // affichage des pieces utilisees
-
-	cout << "------------" << endl;
-	for(list<piece>::iterator it = disponibles.begin(); it != disponibles.end(); it++)
+	else
 	{
-	    it->affiche();
-	    cout << "------------" << endl;
-	}
+	    board socle(dimx, dimy, '.');
+	    vector<board> solutions;
+	    vector<board> filtred_solutions;
+	    vector<calque_set> configuration;
+	    vector<unsigned int> avail;
 
-#endif
+	    cout << "Configuration correcte" << endl;
+	    debug_piece(disponibles);
 
-	    // algorithme de recherche
+		// preparation de l'algorithme de recherche
 
-	time_t now = time(nullptr);
-	cout << "Debut le " << ctime(&now);
-	cout << "creation des calques ..." << endl;
-	cout.flush();
-	vector<calque_set> configuration;
-	vector<unsigned int> avail;
-	init_resoud2(disponibles, dimx, dimy, configuration, avail, solutions);
+	    display_time("creation des calques ...");
+	    init_resout(disponibles, dimx, dimy, configuration, avail, solutions);
 
-	now = time(nullptr);
-	cout << "Debut des recherches de solutions le " << ctime(&now);
-	cout.flush();
-	resoud2(socle, configuration, avail, solutions, 1);
-	now = time(nullptr);
-	cout << "Fin des recherches de solutions le " << ctime(&now);
+		// recherche
 
-	cout << "Suppression des solutions dupliquees ... " << endl;
-	cout.flush();
+	    display_time("Debut des recherches de solutions...");
+	    resout(socle, configuration, avail, solutions, 1);
 
-	filtred_solutions.clear();
-	for(unsigned int src = 0; src < solutions.size() ; src++)
-	{
-	    unsigned int dst = src+1;
-	    while(dst < solutions.size() && !solutions[src].similaire(solutions[dst]))
-		dst++;
-	    if(dst >= solutions.size()) // dernier element de l'ensemble de solutions similaires
-		filtred_solutions.push_back(solutions[src]);
-	}
-	now = time(nullptr);
-	cout << "Fin des la suppression de solutuon dupliquees : " << ctime(&now);
+		// suppression des solutions dupliquees
+
+	    display_time("Suppression des solutions dupliquees ... ");
+	    filtred_solutions = remove_dup(solutions);
+	    display_time("Recherche terminee");
 
 	    // affichage des solutions
 
-	cout << solutions.size() << " solutions trouvees (avec duplications)" << endl;
-	cout << filtred_solutions.size() << " solutions trouvees : " << endl;
-	while(filtred_solutions.size() > 0)
-	{
-	    cout << endl;
-	    filtred_solutions.back().affiche();
-	    filtred_solutions.pop_back();
+	    cout << solutions.size() << " solutions trouvees (avec duplications)" << endl;
+	    cout << filtred_solutions.size() << " solutions uniques trouvees : " << endl;
+	    display_solutions(filtred_solutions);
+
+	    display_time("Fin du programme.");
 	}
-	cout << endl;
-
-	now = time(nullptr);
-	cout << "Fin du programme " << ctime(&now);
-
-	return 0;
     }
     catch(int & e)
     {
@@ -258,4 +306,6 @@ int main(int argc, char *argv[])
 	cout << "Exception inconnue !!!" << endl;
 	return 126;
     }
+
+    return 0;
 }
