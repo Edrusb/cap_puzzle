@@ -1,3 +1,6 @@
+#ifndef BOARD_HPP
+#define BOARD_HPP
+
 #include "espace.hpp"
 #include "calque.hpp"
 #include "erreurs.hpp"
@@ -25,3 +28,5 @@ private:
 
     board transform(rotation rot, retournement ret) const;
 };
+
+#endif

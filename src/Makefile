@@ -5,7 +5,7 @@ CXXFLAGS = -g -pedantic -std=c++11 -pg
 #LDFLAGS = -O2 -std=c++11 -pg
 LDFLAGS = -g
 
-OBJ=puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o
+OBJ=puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o travail.o
 
 all: puzzle
 
@@ -15,7 +15,7 @@ clean:
 puzzle: $(OBJ)
 	$(CXX) $(LDFLAGS) $(OBJ) -o $@
 
-puzzle.cpp : calque_set.hpp pieces.hpp board.hpp
+puzzle.cpp : calque_set.hpp pieces.hpp board.hpp travail.hpp
 calque_set.cpp : calque_set.hpp
 position.cpp: position.hpp
 calque.cpp: calque.hpp
@@ -23,6 +23,7 @@ pieces.cpp: pieces.hpp
 rotation.cpp: rotation.hpp
 board.cpp: board.hpp
 fd_tools.cpp: fd_tools.hpp
+travail.cpp: travail.hpp
 
 calque_set.hpp: pieces.hpp calque.hpp position.hpp
 calque.hpp: espace.hpp etat.hpp
@@ -31,3 +32,4 @@ board.hpp: espace.hpp calque.hpp erreurs.hpp rotation.hpp
 position.hpp: rotation.hpp
 calque.hpp: espace.hpp etat.hpp cellule.hpp
 espace.hpp: erreurs.hpp fd_tools.hpp
+travail.hpp: candidate.hpp board.hpp calque_set.hpp
