@@ -8,6 +8,7 @@
 
 using namespace std;
 
+    /// calque is a binary espace (empty/busy) which also provides an optimized way to get the list of busy cells
 
 class calque : public espace<etat>
 {
