@@ -40,20 +40,6 @@ bool calque::operator == (const calque & ref)
 void calque::sort()
 {
     std::sort(busy.begin(), busy.end());
-
-	/*   unsigned int maxi = busy.size() - 1;
-    cellule tmp = cellule(0,0);
-
-    for(unsigned int i = 0; i < maxi; i++)
-	for(unsigned int j = i+1; j < busy.size(); j++)
-	    if(busy[j] < busy[i])
-	    {
-		tmp = busy[i];
-		busy[i] = busy[j];
-		busy[j] = tmp;
-	    }
-
-	*/
 }
 
 
