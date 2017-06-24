@@ -1,4 +1,4 @@
-CXXFLAGS = -O3 -DNDEBUG
+CXXFLAGS = -O3 -DNDEBUG -std=c++11
 #CXXFLAGS = -O2 -DNDEBUG -pg
 #CXXFLAGS = -ggdb -pedantic -pg
 LDFLAGS = -O3

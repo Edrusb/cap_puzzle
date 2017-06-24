@@ -110,31 +110,31 @@ template <class T> void espace<T>::init(unsigned x, unsigned y)
     if(x > 0 && y > 0)
     {
 	tableau = new T*[size_x];
-	if(tableau == NULL)
+	if(tableau == nullptr)
 	    throw E_MEM;
 	for(unsigned int c = 0; c < size_x; c++)
-	    tableau[c] = NULL;
+	    tableau[c] = nullptr;
 
 	try
 	{
 	    for(unsigned int c = 0; c < size_x; c++)
 	    {
 		tableau[c] = new T[size_y];
-		if(tableau[c] == NULL)
+		if(tableau[c] == nullptr)
 		    throw E_MEM;
 	    }
 	}
 	catch(...)
 	{
 	    for(unsigned int c = 0; c < size_x; c++)
-		if(tableau[c] != NULL)
+		if(tableau[c] != nullptr)
 		    delete[] tableau[c];
 	    delete[] tableau;
 	    throw;
 	}
     }
     else
-	tableau = NULL;
+	tableau = nullptr;
 }
 
 template <class T> bool espace<T>::operator == (const espace & ref) const

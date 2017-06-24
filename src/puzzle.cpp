@@ -53,7 +53,7 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
 
     if(avail.size() == 0)
     {
-	time_t now = time(NULL);
+	time_t now = time(nullptr);
 	solutions.push_back(current);
 	cout << "Solution " << solutions.size() << " trouvee le " << ctime(&now);
 	cout.flush();
@@ -99,7 +99,7 @@ void resoud2(board & current, const vector<calque_set> & configuration, vector<u
 #ifndef NDEBUG
 	    if(level <= 3)
 	    {
-		time_t now = time(NULL);
+		time_t now = time(nullptr);
 		cout << "[level " << level << "]  " << ca+1 << " / " << dispo.size() << " : " << ctime(&now) << endl;
 	    }
 #endif
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
 
 	    // algorithme de recherche
 
-	time_t now = time(NULL);
+	time_t now = time(nullptr);
 	cout << "Debut le " << ctime(&now);
 	cout << "creation des calques ..." << endl;
 	cout.flush();
@@ -203,11 +203,11 @@ int main(int argc, char *argv[])
 	vector<unsigned int> avail;
 	init_resoud2(disponibles, dimx, dimy, configuration, avail, solutions);
 
-	now = time(NULL);
+	now = time(nullptr);
 	cout << "Debut des recherches de solutions le " << ctime(&now);
 	cout.flush();
 	resoud2(socle, configuration, avail, solutions, 1);
-	now = time(NULL);
+	now = time(nullptr);
 	cout << "Fin des recherches de solutions le " << ctime(&now);
 
 	cout << "Suppression des solutions dupliquees ... " << endl;
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 	    if(dst >= solutions.size()) // dernier element de l'ensemble de solutions similaires
 		filtred_solutions.push_back(solutions[src]);
 	}
-	now = time(NULL);
+	now = time(nullptr);
 	cout << "Fin des la suppression de solutuon dupliquees : " << ctime(&now);
 
 	    // affichage des solutions
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 	}
 	cout << endl;
 
-	now = time(NULL);
+	now = time(nullptr);
 	cout << "Fin du programme " << ctime(&now);
 
 	return 0;
