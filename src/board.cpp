@@ -155,13 +155,16 @@ board board::transform(rotation rot, retournement ret) const
 
 bool board::similaire(const board & ref) const
 {
-    for(rotation rot = nord; rot != ouest ; suivant(rot))
+    rotation rot = nord;
+
+    do
     {
 	if(transform(rot, pile) == ref)
 	    return true;
 	if(transform(rot, face) == ref)
 	    return true;
     }
+    while(suivant(rot));
 
     return false;
 }
