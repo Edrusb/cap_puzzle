@@ -15,16 +15,6 @@ board & board::operator = (const board & ref)
     return *this;
 }
 
-void board::affiche() const
-{
-    for(register unsigned int y = 0; y < get_size_y(); y++)
-    {
-	for(register unsigned int x = 0; x < get_size_x(); x++)
-	    cout << get_etat(x, y);
-	cout << endl;
-    }
-}
-
 bool board::add(const vector<cellule> & ou, unsigned char quoi)
 {
     for(signed int num = 0; num < ou.size(); num++)
