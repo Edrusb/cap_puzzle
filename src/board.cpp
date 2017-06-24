@@ -112,11 +112,13 @@ bool board::find_free_space(signed int & x, signed int & y) const
 
 board board::transform(rotation rot, retournement ret) const
 {
-    board xformed = board(get_size_x(), get_size_y(), empty);
+    board xformed = board(0,0,empty);
     register unsigned int dx, dy;
 
     if(rot == est || rot == ouest)
 	xformed = board(get_size_y(), get_size_x(), empty);
+    else
+	xformed = board(get_size_x(), get_size_y(), empty);
 
     for(register unsigned int x = 0; x < get_size_x(); x++)
 	for(register unsigned int y = 0; y < get_size_y(); y++)
