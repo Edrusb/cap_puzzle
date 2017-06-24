@@ -10,6 +10,7 @@ using namespace std;
 struct cellule
 {
     cellule(unsigned int vx, unsigned int vy) { x = vx; y = vy; };
+
     unsigned int x;
     unsigned int y;
     bool operator < (const cellule & ref) const { return x < ref.x || (x == ref.x && y < ref.y); };
@@ -21,6 +22,7 @@ class calque : public espace<etat>
 public:
     calque(unsigned int x, unsigned int y) : espace<etat>(x, y) { busy.clear(); };
     calque(const calque & ref): espace<etat>(ref) { busy = ref.busy; };
+    calque(calque && ref): espace<etat>(ref) { busy = move(ref.busy); };
     calque & operator = (const calque & ref);
     bool operator == (const calque & ref);
 

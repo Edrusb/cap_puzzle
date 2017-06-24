@@ -8,6 +8,7 @@ class board : public espace<unsigned char>
 public:
     board(unsigned x, unsigned y, unsigned char init) : espace<unsigned char>(x, y), empty(init) { clear(init); };
     board(const board & ref): espace<unsigned char>(ref) { empty = ref.empty; };
+    board(board && ref): espace(ref) { empty = move(ref.empty); ref.empty = '\0'; };
     board & operator = (const board & ref);
 
     bool operator == (const board & ref) const { return espace<unsigned char>::operator ==(ref); };
