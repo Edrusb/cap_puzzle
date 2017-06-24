@@ -1,0 +1,20 @@
+
+   class espace<>              enum rotation; enum retournement
+         |                                     |
+         |                                     |
+         |                                     V
+         |        enum etat             struct position
+         |           |                         |
+         |           |   enum case             |
+         |           |      |                  |
+         |           |      |                  |
+         ------------+-------                  |
+         |           |                         |
+         V           V                         |
+   class piece  class calque                   |
+         |           |                         |
+         |           |                         |
+         ------+-----+--------------------------
+               |
+               V
+           calque_set
