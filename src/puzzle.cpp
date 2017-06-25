@@ -9,16 +9,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include "resultat.hpp"
+#include "robot.hpp"
 
-typedef vector<board> resultat;
-
-static travail init_resout(const list<piece> & pi,              //< list of piece to play with
-			   unsigned int dimx,                   //< dimension of the board
-			   unsigned int dimy,                   //< dimension of the board
-			   vector<calque_set> & configuration); //< set of all valid calques derived from each piece
-static void resout(travail & work,         //< what to solve
-		   resultat & solutions,   //< record of all completed solution found so far
-		   unsigned int level);    //< recursion level
+static travail *init_resout(const list<piece> & pi,              //< list of piece to play with
+			    unsigned int dimx,                   //< dimension of the board
+			    unsigned int dimy,                   //< dimension of the board
+			    vector<calque_set> & configuration); //< set of all valid calques derived from each piece
 static bool read_from_file(const char *name, list<piece> & disponibles, unsigned int & x, unsigned int & y);
 static void display_time(const string & message);
 static void display_solutions(const vector<board> & filtred_solutions);
@@ -26,10 +23,10 @@ static void debug_piece(const list<piece> & disponibles);
 static void display_usage(const char *cmd);
 static vector<board> remove_dup(const vector<board> & solutions);
 
-static travail init_resout(const list<piece> & pi,
-			   unsigned int dimx,
-			   unsigned int dimy,
-			   vector<calque_set> & configuration)
+static travail *init_resout(const list<piece> & pi,
+			    unsigned int dimx,
+			    unsigned int dimy,
+			    vector<calque_set> & configuration)
 {
     list<piece>::const_iterator it = pi.begin();
 
@@ -42,40 +39,7 @@ static travail init_resout(const list<piece> & pi,
 	it++;
     }
 
-    return travail(dimx, dimy, configuration);
-}
-
-static void resout(travail & work,
-		   resultat & solutions,
-		   unsigned int level)
-{
-    vector<candidate> dispo;
-
-	// verification qu'il reste encore des pieces a mettre
-
-    if(work.all_placed())
-    {
-	time_t now = time(nullptr);
-
-	solutions.push_back(work.current);
-	cout << "Solution " << solutions.size() << " trouvee le " << ctime(&now);
-	cout.flush();
-	return;
-    }
-
-    work.find_candidates(dispo);
-
-	// pour chaque calque, insertion du calque, mise a jour des used/no_used, recursion, suppression du calque
-
-    for(register unsigned int ca = 0 ; ca < dispo.size(); ca++)
-    {
-	if(work.push_candidate(dispo[ca]))
-	{
-	    resout(work, solutions, level+1); // recursion
-	    work.pop_candidate(dispo[ca]);
-	}
-	    // else // ajout non effectue car en conflit avec une autre piece deja en place
-    }
+    return new travail(dimx, dimy, configuration);
 }
 
 
@@ -198,9 +162,10 @@ int main(int argc, char *argv[])
 	    exit(2);
 	else
 	{
-	    vector<board> solutions;
-	    vector<board> filtred_solutions;
+	    resultat solutions;
+	    resultat filtred_solutions;
 	    vector<calque_set> configuration;
+	    vector<robot> workers(3);
 
 	    cout << "Configuration correcte" << endl;
 	    debug_piece(disponibles);
@@ -208,12 +173,40 @@ int main(int argc, char *argv[])
 		// preparation de l'algorithme de recherche
 
 	    display_time("creation des calques ...");
-	    travail work = init_resout(disponibles, dimx, dimy, configuration);
+	    travail *work = init_resout(disponibles, dimx, dimy, configuration);
+	    if(work == nullptr)
+		throw E_MEM;
+	    workers[0].receive_work(work, 1);
+	    work = nullptr;
 
 		// recherche
 
 	    display_time("Debut des recherches de solutions...");
-	    resout(work, solutions, 1);
+	    vector<robot>::iterator it = workers.begin();
+	    while(it != workers.end())
+	    {
+		it->run();
+		++it;
+	    }
+		// synchronizing all workers
+		// ___comment___;
+
+		// waiting for all workers to die
+
+	    it = workers.begin();
+	    while(it != workers.end())
+	    {
+		it->join();
+		++it;
+	    }
+
+		// fusion des solutions
+	    it = workers.begin();
+	    while(it != workers.end())
+	    {
+		solutions += it->get_solutions();
+		++it;
+	    }
 
 		// suppression des solutions dupliquees
 
