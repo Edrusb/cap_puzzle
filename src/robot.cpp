@@ -46,6 +46,8 @@ void robot::inherited_inherited_run()
     {
 	    // fill the todo list with some data
 	resout(true);
+	delete work;
+	work = nullptr;
 	set_init_flag_down();
     }
 
@@ -138,7 +140,8 @@ void robot::resout(bool init)
 
 bool robot::check_init_flag()
 {
-    bool ret = false;
+    bool ret = false;  // we are not the first object awake with work available (modified later if necessary)
+    bool stop = false; // we will not suspend (modified later if necessary)
 
     flag_control.lock();
     try
@@ -146,8 +149,11 @@ bool robot::check_init_flag()
 	if(init_flag)
 	{
 	    if(work == nullptr)
+	    {
 		++parked;
-	    else
+		stop = true;
+	    }
+	    else // we have work and we are the first
 		ret = true;
 	}
     }
@@ -158,7 +164,7 @@ bool robot::check_init_flag()
     }
     flag_control.unlock();
 
-    if(!ret)
+    if(stop)
 	parking.lock();
 
     return ret;
@@ -173,7 +179,7 @@ void robot::set_init_flag_down()
 	    E_BUG;
 	init_flag = false;
 
-	while(parked < 0)
+	while(parked > 0)
 	{
 	    parking.unlock();
 	    --parked;
