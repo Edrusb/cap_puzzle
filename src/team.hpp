@@ -13,11 +13,6 @@ public:
     team();
     ~team();
 
-	/// all thread will start runing when all are awaken
-
-	/// \note by default a thread runs ASAP which is equivalent to giving 1 for the team size, here
-    static void set_team_size(unsigned int size_cohorte);
-
 protected:
 	/// a running team member has to regularly check that another worker need work
 
@@ -69,7 +64,6 @@ private:
     static list<member *> instances;
     static bool election_started;
     static bool work_provided;
-    static libthreadar::barrier *synchro;
 };
 
 #endif

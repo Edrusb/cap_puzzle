@@ -7,7 +7,6 @@ libthreadar::mutex team::instances_control;
 list<team::member *> team::instances;
 bool team::election_started = false;
 bool team::work_provided = false;
-libthreadar::barrier *team::synchro = nullptr;
 
 team::team()
 {
@@ -41,40 +40,6 @@ team::~team()
 	delete me;
 	me = nullptr;
 	instances.erase(it);
-    }
-    catch(...)
-    {
-	instances_control.unlock();
-	throw;
-    }
-    instances_control.unlock();
-}
-
-void team::set_team_size(unsigned int size_cohorte)
-{
-    instances_control.lock();
-    try
-    {
-	list<member *>::iterator it = instances.begin();
-
-	while(it != instances.end() && (*it != nullptr) && !(*it)->dying_or_dead)
-	    ++it;
-
-	if(it != instances.end())
-	    E_BUG;
-
-	if(synchro != nullptr)
-	{
-	    delete synchro;
-	    synchro = nullptr;
-	}
-
-	if(size_cohorte > 1)
-	{
-	    synchro = new libthreadar::barrier(size_cohorte);
-	    if(synchro == nullptr)
-		throw E_MEM;
-	}
     }
     catch(...)
     {
@@ -234,9 +199,8 @@ bool team::ask_delegation()
 
 void team::inherited_run()
 {
+    assert(me != nullptr);
     me->dying_or_dead = false;
-    if(synchro != nullptr)
-	synchro->wait();
     inherited_inherited_run();
     me->dying_or_dead = true;
     check_delegate(0);

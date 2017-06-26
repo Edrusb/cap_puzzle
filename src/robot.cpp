@@ -1,12 +1,33 @@
 #include "robot.hpp"
 
 todo_list robot::todo;
+libthreadar::mutex robot::flag_control;
+bool robot::init_flag;
+unsigned int robot::parked;
+libthreadar::freezer robot::parking;
 
 robot::robot()
 {
     work = nullptr;
     level = 0;
     dispo_ptr = nullptr;
+}
+
+void robot::reset_init_flag()
+{
+    flag_control.lock();
+    try
+    {
+	init_flag = true;
+	parked = 0;
+	parking.reset();
+    }
+    catch(...)
+    {
+	flag_control.unlock();
+	throw;
+    }
+    flag_control.unlock();
 }
 
 void robot::receive_work(travail *w, unsigned int index)
@@ -21,6 +42,13 @@ void robot::inherited_inherited_run()
 {
     bool loop = true;
 
+    if(check_init_flag())
+    {
+	    // fill the todo list with some data
+	resout(true);
+	set_init_flag_down();
+    }
+
     while(loop)
     {
 	if(work == nullptr)
@@ -31,13 +59,13 @@ void robot::inherited_inherited_run()
 	    }
 	    else
 	    {
-		resout();
+		resout(false);
 		delete work;
 		work = nullptr;
 	    }
 	else
 	{
-	    resout();
+	    resout(false);
 	    delete work;
 	    work = nullptr;
 	}
@@ -67,7 +95,7 @@ void robot::delegate_work()
     dispo_ptr->clear(); // avoid doing twice the work
 }
 
-void robot::resout()
+void robot::resout(bool init)
 {
     vector<candidate> dispo;
 
@@ -87,7 +115,10 @@ void robot::resout()
 
     work->find_candidates(dispo);
     dispo_ptr = &dispo; // to have delegate_work() able to push work to the todo_list
-    check_delegate(level+1);
+    if(init)
+	delegate_work();
+    else
+	check_delegate(level+1);
     dispo_ptr = nullptr; // just by precaution
 
 	// pour chaque calque, insertion du calque, mise a jour des used/no_used, recursion, suppression du calque
@@ -97,10 +128,61 @@ void robot::resout()
     {
 	if(work->push_candidate(dispo[ca]))
 	{
-	    resout();
+	    resout(false);
 	    work->pop_candidate(dispo[ca]);
 	}
 	    // else // ajout non effectue car en conflit avec une autre piece deja en place
     }
     --level;
+}
+
+bool robot::check_init_flag()
+{
+    bool ret = false;
+
+    flag_control.lock();
+    try
+    {
+	if(init_flag)
+	{
+	    if(work == nullptr)
+		++parked;
+	    else
+		ret = true;
+	}
+    }
+    catch(...)
+    {
+	flag_control.unlock();
+	throw;
+    }
+    flag_control.unlock();
+
+    if(!ret)
+	parking.lock();
+
+    return ret;
+}
+
+void robot::set_init_flag_down()
+{
+    flag_control.lock();
+    try
+    {
+	if(!init_flag)
+	    E_BUG;
+	init_flag = false;
+
+	while(parked < 0)
+	{
+	    parking.unlock();
+	    --parked;
+	}
+    }
+    catch(...)
+    {
+	flag_control.unlock();
+	throw;
+    }
+    flag_control.unlock();
 }

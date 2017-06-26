@@ -156,6 +156,7 @@ int main(int argc, char *argv[])
     {
 	list<piece> disponibles;
 	unsigned int dimx, dimy;
+	const unsigned int team_size = 1;
 
 	cout  << "Lecture du fichier de configuration..." << endl;
 	if(!read_from_file(argv[1], disponibles, dimx, dimy))
