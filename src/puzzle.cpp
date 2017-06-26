@@ -22,6 +22,8 @@ static void display_solutions(const vector<board> & filtred_solutions);
 static void debug_piece(const list<piece> & disponibles);
 static void display_usage(const char *cmd);
 static vector<board> remove_dup(const vector<board> & solutions);
+static void new_robots(vector<robot *> & ref, unsigned int num);
+static void delete_robots(vector<robot *> & ref);
 
 static travail *init_resout(const list<piece> & pi,
 			    unsigned int dimx,
@@ -144,6 +146,29 @@ static vector<board> remove_dup(const vector<board> & solutions)
     return ret;
 }
 
+static void new_robots(vector<robot *> & ref, unsigned int num)
+{
+    robot *tmp = nullptr;
+
+    for(unsigned int i = 0 ; i < num ; ++i)
+    {
+	tmp = new (nothrow) robot();
+	if(tmp == nullptr)
+	    throw E_MEM;
+	ref.push_back(tmp);
+    }
+}
+
+static void delete_robots(vector<robot *> & ref)
+{
+    while(ref.size() > 0)
+    {
+	if(ref.back() != nullptr)
+	    delete ref.back();
+	ref.pop_back();
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if(argc != 2)
@@ -166,48 +191,61 @@ int main(int argc, char *argv[])
 	    resultat solutions;
 	    resultat filtred_solutions;
 	    vector<calque_set> configuration;
-	    vector<robot> workers(3);
+	    vector<robot *> workers;
 
-	    cout << "Configuration correcte" << endl;
-	    debug_piece(disponibles);
-
-		// preparation de l'algorithme de recherche
-
-	    display_time("creation des calques ...");
-	    travail *work = init_resout(disponibles, dimx, dimy, configuration);
-	    if(work == nullptr)
-		throw E_MEM;
-	    workers[0].receive_work(work, 1);
-	    work = nullptr;
-
-		// recherche
-
-	    display_time("Debut des recherches de solutions...");
-	    vector<robot>::iterator it = workers.begin();
-	    while(it != workers.end())
+	    try
 	    {
-		it->run();
-		++it;
+		new_robots(workers, team_size);
+
+		cout << "Configuration correcte" << endl;
+		debug_piece(disponibles);
+
+		    // preparation de l'algorithme de recherche
+
+		display_time("creation des calques ...");
+		travail *work = init_resout(disponibles, dimx, dimy, configuration);
+		if(work == nullptr)
+		    throw E_MEM;
+		assert(workers[0] != nullptr);
+		workers[0]->receive_work(work, 1);
+		work = nullptr;
+
+		    // recherche
+
+		display_time("Debut des recherches de solutions...");
+		vector<robot *>::iterator it = workers.begin();
+		while(it != workers.end())
+		{
+		    assert(*it != nullptr);
+		    (*it)->run();
+		    ++it;
+		}
+
+		    // waiting for all workers to die
+
+		it = workers.begin();
+		while(it != workers.end())
+		{
+		    assert(*it != nullptr);
+		    (*it)->join();
+		    ++it;
+		}
+
+		    // fusion des solutions
+		it = workers.begin();
+		while(it != workers.end())
+		{
+		    assert(*it != nullptr);
+		    solutions += (*it)->get_solutions();
+		    ++it;
+		}
 	    }
-		// synchronizing all workers
-		// ___comment___;
-
-		// waiting for all workers to die
-
-	    it = workers.begin();
-	    while(it != workers.end())
+	    catch(...)
 	    {
-		it->join();
-		++it;
+		delete_robots(workers);
+		throw;
 	    }
-
-		// fusion des solutions
-	    it = workers.begin();
-	    while(it != workers.end())
-	    {
-		solutions += it->get_solutions();
-		++it;
-	    }
+	    delete_robots(workers);
 
 		// suppression des solutions dupliquees
 
