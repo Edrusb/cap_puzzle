@@ -13,7 +13,7 @@ team::team()
     instances_control.lock();
     try
     {
-	member *me = new member();
+	me = new member();
 	if(me == nullptr)
 	    throw E_MEM;
 	instances.push_back(me);
