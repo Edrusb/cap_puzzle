@@ -140,8 +140,8 @@ void robot::resout(bool init)
 
 bool robot::check_init_flag()
 {
-    bool ret = false;  // we are not the first object awake with work available (modified later if necessary)
-    bool stop = false; // we will not suspend (modified later if necessary)
+    bool ret = false;  // assuming we are not the first object awaken with a work available
+    bool stop = false; // assuming we will not suspend
 
     flag_control.lock();
     try
@@ -151,10 +151,10 @@ bool robot::check_init_flag()
 	    if(work == nullptr)
 	    {
 		++parked;
-		stop = true;
+		stop = true; // we will suspend
 	    }
 	    else // we have work and we are the first
-		ret = true;
+		ret = true; // we are the first object awaken with a work available
 	}
     }
     catch(...)

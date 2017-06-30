@@ -119,7 +119,7 @@ static void debug_piece(const list<piece> & disponibles)
 
 static void display_usage(const char *cmd)
 {
-    cout << "usage: " << cmd << " <fichier>" << endl << endl;
+    cout << "usage: " << cmd << " <fichier> <num thread>" << endl << endl;
     cout << "\t syntaxe du fichier attendu :" << endl;
     cout << "\t[dimx, dimy]" << endl;
     cout << "\t(x,y)[S] \n\t 1 0 0 ... \n\t 0 0 1 ... \n\t ... \n\n";
@@ -146,7 +146,7 @@ static vector<board> remove_dup(const vector<board> & solutions)
 
 int main(int argc, char *argv[])
 {
-    if(argc != 2)
+    if(argc != 3)
     {
 	display_usage(argv[0]);
 	exit(1);
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     {
 	list<piece> disponibles;
 	unsigned int dimx, dimy;
-	const unsigned int team_size = 2;
+	const unsigned int team_size = atoi(argv[2]);
 
 	cout  << "Lecture du fichier de configuration..." << endl;
 	if(!read_from_file(argv[1], disponibles, dimx, dimy))
@@ -183,6 +183,7 @@ int main(int argc, char *argv[])
 
 		// recherche
 
+	    cout << "Creation de " << team_size << " thread" << (team_size > 1 ? "s" : "") << endl;
 	    display_time("Debut des recherches de solutions...");
 	    vector<robot>::iterator it = workers.begin();
 	    while(it != workers.end())
