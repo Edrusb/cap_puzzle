@@ -1,9 +1,11 @@
-#CXXFLAGS = -O3 -DNDEBUG -std=c++11
-#CXXFLAGS = -O2 -DNDEBUG -std=c++11 -pg
-CXXFLAGS = -g -pedantic -std=c++11 -pg -I/home/denis/usr/include
-#LDFLAGS = -O3 -std=c++11
-#LDFLAGS = -O2 -std=c++11 -pg
-LDFLAGS = -g -L/home/denis/usr/lib -lthreadar
+CXXFLAGS = -O3 -std=c++11 -DNDEBUG
+LDFLAGS = -O3 -std=c++11 -lthreadar
+
+#CXXFLAGS = -O2  -std=c++11 -DNDEBUG
+#LDFLAGS = -O2 -std=c++11 -lthreadar
+
+#CXXFLAGS = -g -std=c++11 -pedantic -pg
+#LDFLAGS = -g -std=c++11 -lthreadar -pg
 
 OBJ=puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o travail.o team.o todo_list.o robot.o resultat.o
 
