@@ -110,7 +110,6 @@ void robot::resout(bool init)
 	time_t now = time(nullptr);
 
 	solutions.push_back(work->current);
-	cout << "Solution " << solutions.size() << " trouvee le " << ctime(&now);
 	cout.flush();
 	return;
     }
