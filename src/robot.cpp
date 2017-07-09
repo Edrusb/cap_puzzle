@@ -81,7 +81,7 @@ void robot::delegate_work()
     assert(dispo_ptr != nullptr);
     assert(work != nullptr);
 
-    vector<candidate>::iterator it = dispo_ptr->begin();
+    list<candidate>::iterator it = dispo_ptr->begin();
     travail *tmp = nullptr;
 
     while(it != dispo_ptr->end())
@@ -99,7 +99,7 @@ void robot::delegate_work()
 
 void robot::resout(bool init)
 {
-    vector<candidate> dispo;
+    list<candidate> dispo;
 
     assert(work != nullptr);
 
@@ -125,12 +125,12 @@ void robot::resout(bool init)
 	// pour chaque calque, insertion du calque, mise a jour des used/no_used, recursion, suppression du calque
 
     ++level;
-    for(register unsigned int ca = 0 ; ca < dispo.size(); ca++)
+    for(list<candidate>::iterator ca = dispo.begin(); ca != dispo.end(); ca++)
     {
-	if(work->push_candidate(dispo[ca]))
+	if(work->push_candidate(*ca))
 	{
 	    resout(false);
-	    work->pop_candidate(dispo[ca]);
+	    work->pop_candidate(*ca);
 	}
 	    // else // ajout non effectue car en conflit avec une autre piece deja en place
     }

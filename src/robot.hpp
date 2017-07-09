@@ -27,7 +27,7 @@ protected:
 private:
     travail *work;
     unsigned int level;
-    vector<candidate> *dispo_ptr;
+    list<candidate> *dispo_ptr;
     resultat solutions;
 
     void resout(bool init);    // look for solution based on current "work"

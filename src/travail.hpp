@@ -4,7 +4,7 @@
 #include "candidate.hpp"
 #include "board.hpp"
 #include "calque_set.hpp"
-#include <vector>
+#include <list>
 
 using namespace std;
 
@@ -16,7 +16,7 @@ public:
 	    const vector<calque_set> & config);
 
     bool all_placed() { return avail.size() == 0; };
-    void find_candidates(vector<candidate> & dispo);
+    void find_candidates(list<candidate> & dispo);
     bool push_candidate(const candidate & candid);
     void pop_candidate(const candidate & candid);
 
