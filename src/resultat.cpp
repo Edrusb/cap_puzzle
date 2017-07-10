@@ -2,7 +2,7 @@
 
 resultat operator += (resultat & x, const resultat & y)
 {
-    vector<board>::const_iterator it = y.begin();
+    resultat::const_iterator it = y.begin();
 
     while(it != y.end())
     {

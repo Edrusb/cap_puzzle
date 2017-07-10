@@ -2,11 +2,11 @@
 #define RESULTAT_HPP
 
 #include "board.hpp"
-#include <vector>
+#include <list>
 
 using namespace std;
 
-typedef vector<board> resultat;
+typedef list<board> resultat;
 
 extern resultat operator += (resultat & x, const resultat & y);
 

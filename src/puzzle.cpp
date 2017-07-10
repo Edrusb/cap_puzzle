@@ -18,10 +18,10 @@ static travail *init_resout(const list<piece> & pi,              //< list of pie
 			    vector<calque_set> & configuration); //< set of all valid calques derived from each piece
 static bool read_from_file(const char *name, list<piece> & disponibles, unsigned int & x, unsigned int & y);
 static void display_time(const string & message);
-static void display_solutions(const vector<board> & filtred_solutions);
+static void display_solutions(const resultat & filtred_solutions);
 static void debug_piece(const list<piece> & disponibles);
 static void display_usage(const char *cmd);
-static vector<board> remove_dup(const vector<board> & solutions);
+static resultat remove_dup(const resultat & solutions);
 
 static travail *init_resout(const list<piece> & pi,
 			    unsigned int dimx,
@@ -88,9 +88,9 @@ static void display_time(const string & message)
     cout.flush();
 }
 
-static void display_solutions(const vector<board> & filtred_solutions)
+static void display_solutions(const resultat & filtred_solutions)
 {
-    vector<board>::const_reverse_iterator it = filtred_solutions.rbegin();
+    resultat::const_reverse_iterator it = filtred_solutions.rbegin();
 
     while(it != filtred_solutions.rend())
     {
@@ -128,17 +128,20 @@ static void display_usage(const char *cmd)
     cout << "\td'autres pièces peuvent être décrites selon le même schema, on peut insérer des espace ou l'on veut\n";
 }
 
-static vector<board> remove_dup(const vector<board> & solutions)
+static resultat remove_dup(const resultat & solutions)
 {
-    vector<board> ret;
+    resultat ret;
+    resultat::const_iterator dst;
+    resultat::const_iterator src;
 
-    for(unsigned int src = 0; src < solutions.size() ; src++)
+    for(src = solutions.begin(); src != solutions.end(); ++src)
     {
-	unsigned int dst = src+1;
-	while(dst < solutions.size() && !solutions[src].similaire(solutions[dst]))
-	    dst++;
-	if(dst >= solutions.size()) // dernier element de l'ensemble de solutions similaires
-	    ret.push_back(solutions[src]);
+	dst = src;
+	++dst;
+	while(dst != solutions.end() && !src->similaire(*dst))
+	    ++dst;
+	if(dst == solutions.end()) // dernier element de l'ensemble de solutions similaires
+	    ret.push_back(*src);
     }
 
     return ret;
