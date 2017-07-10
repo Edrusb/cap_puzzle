@@ -7,6 +7,19 @@
 
 using namespace std;
 
+    /// handle communication between a cohort of workers
+    ///
+    /// there is no chef in the team. worker regularly check
+    /// that no other worker of the team is pending for work
+    /// if so an election is done to select the worker that has
+    /// the highest load, the elected worker push all its work into
+    /// the todo_list and becomes a new pending worker.
+    /// A pending worker fetches a work from the todo_list and solved
+    /// it, upon termination it fetches another one from the todo_list
+    /// and so on. When the todo_list is empty it triggers for an election
+    /// for a working memeber to put its work into the todo_list.
+    /// up to the time the election fails finding any active memeber
+
 class team: public libthreadar::thread
 {
 public:

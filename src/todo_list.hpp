@@ -7,6 +7,8 @@
 
 using namespace std;
 
+    // stores works that no worker is currently trying to solve
+
 class todo_list
 {
 public:

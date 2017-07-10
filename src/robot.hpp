@@ -7,6 +7,8 @@
 #include "todo_list.hpp"
 #include <list>
 
+    /// implements the work process of a worker in the team
+
 class robot: public team
 {
 public:

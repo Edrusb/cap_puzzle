@@ -6,7 +6,7 @@
 
 using namespace std;
 
-    /// holds information about the a calque to try in order to fill a hole
+    /// holds information about a calque to try in order to fill a hole
 
 struct candidate
 {
