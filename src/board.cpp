@@ -4,17 +4,6 @@
 
 using namespace std;
 
-board & board::operator = (const board & ref)
-{
-    const espace<unsigned char> *x_ref = &ref;
-    espace<unsigned char> *x_this = this;
-
-    *x_this = *x_ref;
-    empty = ref.empty;
-
-    return *this;
-}
-
 bool board::add(const vector<cellule> & ou, unsigned char quoi)
 {
     for(signed int num = 0; num < ou.size(); num++)

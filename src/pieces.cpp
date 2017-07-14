@@ -22,14 +22,3 @@ piece::piece(int fd) : espace<etat>(fd)
 		set_etat(x, y, vide);
 	}
 }
-
-piece & piece::operator = (const piece & ref)
-{
-    const espace<etat> *x_ref = & ref;
-    espace<etat> *x_this = this;
-
-    *x_this = *x_ref;
-    symbol = ref.symbol;
-
-    return *this;
-}

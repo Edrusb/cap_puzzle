@@ -1,17 +1,6 @@
 #include "calque.hpp"
 #include <algorithm>
 
-calque & calque::operator = (const calque & ref)
-{
-    const espace<etat> *x_ref = & ref;
-    espace<etat> *x_this = this;
-
-    *x_this = *x_ref;
-    busy = ref.busy;
-
-    return *this;
-}
-
 void calque::update_busy_cellules()
 {
     busy.clear();

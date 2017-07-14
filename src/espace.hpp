@@ -18,8 +18,9 @@ public:
     espace(unsigned x, unsigned y);
     espace(int fd); // read x and y from a plain text file
     espace(const espace & ref) { copy_from(ref); };
-    espace(espace && ref);
+    espace(espace && ref) { move_from(std::move(ref)); };
     espace & operator = (const espace & ref) { detruit(); copy_from(ref); };
+    espace & operator = (espace && ref) { detruit(); move_from(std::move(ref)); };
     ~espace() { detruit(); };
     bool operator == (const espace & ref) const;
 
@@ -37,6 +38,7 @@ private:
     unsigned int size_x, size_y;
 
     void copy_from(const espace & ref);
+    void move_from(espace && ref);
     void detruit();
     void init(unsigned x, unsigned y);
 };
@@ -59,17 +61,6 @@ template <class T> espace<T>::espace(int fd)
     init(x, y);
 }
 
-template <class T> espace<T>::espace(espace && ref)
-{
-    tableau = ref.tableau;
-    size_x = ref.size_x;
-    size_y = ref.size_y;
-    ref.tableau = nullptr;
-    ref.size_x = 0;
-    ref.size_y = 0;
-}
-
-
 template <class T> void espace<T>::detruit()
 {
     if(size_x > 0 && size_y > 0)
@@ -80,12 +71,22 @@ template <class T> void espace<T>::detruit()
     }
 }
 
-template <class T>void espace<T>::copy_from(const espace & ref)
+template <class T> void espace<T>::copy_from(const espace & ref)
 {
     init(ref.size_x, ref.size_y);
     for(register unsigned int x = 0; x < ref.size_x; x++)
 	for(register unsigned int y = 0; y < ref.size_y; y++)
 	    tableau[x][y] = ref.tableau[x][y];
+}
+
+template <class T> void espace<T>::move_from(espace && ref)
+{
+    tableau = ref.tableau;
+    size_x = ref.size_x;
+    size_y = ref.size_y;
+    ref.tableau = nullptr;
+    ref.size_x = 0;
+    ref.size_y = 0;
 }
 
 template <class T> inline T espace<T>::get_etat(unsigned int x, unsigned int y) const

@@ -14,11 +14,8 @@ class calque : public espace<etat>
 {
 public:
     calque(unsigned int x, unsigned int y) : espace<etat>(x, y) { busy.clear(); };
-    calque(const calque & ref): espace<etat>(ref) { busy = ref.busy; };
-    calque(calque && ref): espace<etat>(ref) { busy = move(ref.busy); };
-    calque & operator = (const calque & ref);
-    bool operator == (const calque & ref);
 
+    bool operator == (const calque & ref);
     const vector<cellule> & get_busy_cellules() const { return busy; };
     void clear() { espace<etat>::clear(vide); busy.clear(); };
 
