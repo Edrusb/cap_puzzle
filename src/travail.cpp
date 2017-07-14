@@ -6,7 +6,7 @@ travail::travail(unsigned int dimx,
 		 const vector<calque_set> & config): current(dimx, dimy, '.'),
 						     configuration(config)
 {
-    for(unsigned int i = 0; i < configuration.size() ; i++)
+    for(unsigned int i = 0; i < configuration.size() ; ++i)
 	avail.push_back(i);
 }
 
