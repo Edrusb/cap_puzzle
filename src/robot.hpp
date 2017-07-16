@@ -5,7 +5,7 @@
 #include "team.hpp"
 #include "resultat.hpp"
 #include "todo_list.hpp"
-#include <list>
+#include <deque>
 
     /// implements the work process of a worker in the team
 
@@ -29,7 +29,7 @@ protected:
 private:
     travail *work;
     unsigned int level;
-    list<candidate> *dispo_ptr;
+    deque<candidate> *dispo_ptr;
     resultat solutions;
 
     void resout(bool init);    // look for solution based on current "work"

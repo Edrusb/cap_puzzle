@@ -11,7 +11,7 @@ travail::travail(unsigned int dimx,
 }
 
 
-void travail::find_candidates(list<candidate> & dispo)
+void travail::find_candidates(deque<candidate> & dispo)
 {
     signed int free_x, free_y;
     candidate tmp;

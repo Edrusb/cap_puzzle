@@ -81,7 +81,7 @@ void robot::delegate_work()
     assert(dispo_ptr != nullptr);
     assert(work != nullptr);
 
-    list<candidate>::iterator it = dispo_ptr->begin();
+    deque<candidate>::iterator it = dispo_ptr->begin();
     travail *tmp = nullptr;
 
     while(it != dispo_ptr->end())
@@ -99,7 +99,7 @@ void robot::delegate_work()
 
 void robot::resout(bool init)
 {
-    list<candidate> dispo;
+    deque<candidate> dispo;
 
     assert(work != nullptr);
 
@@ -125,7 +125,7 @@ void robot::resout(bool init)
 	// pour chaque calque, insertion du calque, mise a jour des used/no_used, recursion, suppression du calque
 
     ++level;
-    for(list<candidate>::iterator ca = dispo.begin(); ca != dispo.end(); ca++)
+    for(deque<candidate>::iterator ca = dispo.begin(); ca != dispo.end(); ca++)
     {
 	if(work->push_candidate(*ca))
 	{
