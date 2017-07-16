@@ -97,9 +97,18 @@ void robot::delegate_work()
     dispo_ptr->clear(); // avoid doing twice the work
 }
 
+deque<candidate> & robot::get_level_from_memory()
+{
+    while(memory.size() < level)
+	memory.push_back(deque<candidate>());
+    assert(level > 0);
+
+    return memory[level - 1];
+}
+
 void robot::resout(bool init)
 {
-    deque<candidate> dispo;
+    deque<candidate> & dispo = get_level_from_memory();
 
     assert(work != nullptr);
 

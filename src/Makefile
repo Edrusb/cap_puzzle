@@ -1,11 +1,11 @@
-CXXFLAGS = -O3 -std=c++11 -DNDEBUG
-LDFLAGS = -O3 -std=c++11 -lthreadar
+#CXXFLAGS = -O3 -std=c++11 -DNDEBUG
+#LDFLAGS = -O3 -std=c++11 -lthreadar
 
 #CXXFLAGS = -O2  -std=c++11 -DNDEBUG
 #LDFLAGS = -O2 -std=c++11 -lthreadar
 
-#CXXFLAGS = -g -std=c++11 -pedantic -pg
-#LDFLAGS = -g -std=c++11 -lthreadar -pg
+CXXFLAGS = -g -std=c++11 -pedantic -pg
+LDFLAGS = -g -std=c++11 -lthreadar -pg
 
 OBJ=puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o travail.o team.o todo_list.o robot.o resultat.o
 
