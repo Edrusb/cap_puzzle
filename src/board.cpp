@@ -6,7 +6,9 @@ using namespace std;
 
 bool board::add(const vector<cellule> & ou, unsigned char quoi)
 {
-    for(signed int num = 0; num < ou.size(); num++)
+    register unsigned int ou_size = ou.size();
+
+    for(signed int num = 0; num < ou_size; num++)
     {
 	assert(ou[num].x < get_size_x());
 	assert(ou[num].y < get_size_y());
@@ -27,7 +29,9 @@ bool board::add(const vector<cellule> & ou, unsigned char quoi)
 
 void board::remove(const vector<cellule> & ou, unsigned char quoi)
 {
-    for(unsigned int num = 0; num < ou.size(); num++)
+    register unsigned int ou_size = ou.size();
+
+    for(unsigned int num = 0; num < ou_size; num++)
     {
 	assert(ou[num].x < get_size_x());
 	assert(ou[num].y < get_size_y());
