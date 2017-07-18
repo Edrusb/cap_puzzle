@@ -26,6 +26,8 @@ public:
     team();
     ~team();
 
+    void run_in_calling_thread() { inherited_run(); };
+
 protected:
 	/// a running team member has to regularly check that another worker need work
 

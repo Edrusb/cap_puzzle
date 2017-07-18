@@ -189,10 +189,18 @@ int main(int argc, char *argv[])
 	    cout << "Creation de " << team_size << " thread" << (team_size > 1 ? "s" : "") << endl;
 	    display_time("Debut des recherches de solutions...");
 	    vector<robot>::iterator it = workers.begin();
-	    while(it != workers.end())
+	    if(team_size > 1)
 	    {
-		it->run();
-		++it;
+		while(it != workers.end())
+		{
+		    it->run();
+		    ++it;
+		}
+	    }
+	    else
+	    {
+		assert(it != workers.end());
+		it->run_in_calling_thread();
 	    }
 
 		// waiting for all workers to die
