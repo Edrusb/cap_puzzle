@@ -15,6 +15,7 @@ void travail::find_candidates(deque<candidate> & dispo)
 {
     signed int free_x, free_y;
     candidate tmp;
+    unsigned int avail_size = avail.size();
 
     dispo.clear();
 
@@ -27,20 +28,25 @@ void travail::find_candidates(deque<candidate> & dispo)
 
 	// recherche des calques disponibles pour les pièces non utilisées
 
-    for(register unsigned int piid = 0; piid < avail.size(); piid++)
+    for(register unsigned int piid = 0; piid < avail_size; piid++)
     {
-	assert(avail[piid] < configuration.size());
-	const calque_set & current_calque_set = configuration[avail[piid]];
+	tmp.calque_set_index = avail[piid];
+
+	assert(tmp.calque_set_index < configuration.size());
+	const calque_set & current_calque_set = configuration[tmp.calque_set_index];
 	unsigned int num_calque = current_calque_set.get_total_num();
+	tmp.symbol = current_calque_set.get_symbol();
 
 	for(unsigned int caid = 0; caid < num_calque; caid++)
-	    if(current_calque_set.read_calque(caid).get_etat(free_x, free_y) == plein)
+	{
+	    const calque & tmp_calque = current_calque_set.read_calque(caid);
+
+	    if(tmp_calque.get_etat(free_x, free_y) == plein)
 	    {
-		tmp.calque_set_index = avail[piid];
-		tmp.busy_cellules = & current_calque_set.read_calque(caid).get_busy_cellules();
-		tmp.symbol = current_calque_set.get_symbol();
+		tmp.busy_cellules = & tmp_calque.get_busy_cellules();
 		dispo.push_back(tmp);
 	    }
+	}
     }
 }
 
