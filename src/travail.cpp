@@ -7,7 +7,7 @@ travail::travail(unsigned int dimx,
 						     configuration(config)
 {
     for(unsigned int i = 0; i < configuration.size() ; ++i)
-	avail.push_back(i);
+	avail.insert(i);
 }
 
 
@@ -15,7 +15,6 @@ void travail::find_candidates(deque<candidate> & dispo)
 {
     signed int free_x, free_y;
     candidate tmp;
-    unsigned int avail_size = avail.size();
 
     dispo.clear();
 
@@ -28,9 +27,9 @@ void travail::find_candidates(deque<candidate> & dispo)
 
 	// recherche des calques disponibles pour les pièces non utilisées
 
-    for(register unsigned int piid = 0; piid < avail_size; piid++)
+    for(unordered_set<unsigned int>::iterator piid = avail.begin(); piid != avail.end(); ++piid)
     {
-	tmp.calque_set_index = avail[piid];
+	tmp.calque_set_index = *piid;
 
 	assert(tmp.calque_set_index < configuration.size());
 	const calque_set & current_calque_set = configuration[tmp.calque_set_index];
@@ -56,13 +55,8 @@ bool travail::push_candidate(const candidate & candid)
     assert(candid.busy_cellules != nullptr);
     if(current.add(*(candid.busy_cellules), candid.symbol))
     {
-	deque<unsigned int>::iterator it = avail.begin();
-
-	while(it != avail.end() && *it != candid.calque_set_index)
-	    ++it;
-	if(it == avail.end())
-	    E_BUG;
-	avail.erase(it);
+	unsigned int val = avail.erase(candid.calque_set_index);
+	assert(val == 1);
 	return true;
     }
     else
@@ -72,6 +66,6 @@ bool travail::push_candidate(const candidate & candid)
 void travail::pop_candidate(const candidate & candid)
 {
     assert(candid.busy_cellules != nullptr);
-    avail.push_back(candid.calque_set_index);
+    avail.insert(candid.calque_set_index);
     current.remove(*(candid.busy_cellules), candid.symbol);
 }

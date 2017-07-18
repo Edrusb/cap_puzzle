@@ -5,6 +5,7 @@
 #include "board.hpp"
 #include "calque_set.hpp"
 #include <deque>
+#include <unordered_set>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ public:
 
 private:
     const vector<calque_set> & configuration; //< pointe sur les calques des pieces
-    deque<unsigned int> avail; //< liste des pieces restant a placer sur le plateau
+    unordered_set<unsigned int> avail; //< liste des pieces restant a placer sur le plateau
 };
 
 #endif
