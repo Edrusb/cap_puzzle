@@ -32,15 +32,6 @@ private:
     deque<candidate> *dispo_ptr;
     resultat solutions;
 
-	// to reduce context switch due to dequeue<candidate> created on
-	// the stack of the recursive method "resout()" resout will use
-	// a pointer to the memory variable, which content is overwritten
-	// but never releases until ~robot()
-
-    deque<deque<candidate> > memory;
-
-    deque<candidate> & get_level_from_memory();
-
     void resout(bool init);    // look for solution based on current "work"
     bool check_init_flag();    // return true if we are the first robot with work
     void set_init_flag_down(); //
