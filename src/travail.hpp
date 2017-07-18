@@ -27,7 +27,7 @@ public:
 
 private:
     const vector<calque_set> & configuration; //< pointe sur les calques des pieces
-    vector<unsigned int> avail; //< liste des pieces restant a placer sur le plateau
+    deque<unsigned int> avail; //< liste des pieces restant a placer sur le plateau
 };
 
 #endif

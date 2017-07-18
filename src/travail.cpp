@@ -56,7 +56,10 @@ bool travail::push_candidate(const candidate & candid)
     assert(candid.busy_cellules != nullptr);
     if(current.add(*(candid.busy_cellules), candid.symbol))
     {
-	vector<unsigned int>::iterator it = find(avail.begin(), avail.end(), candid.calque_set_index);
+	deque<unsigned int>::iterator it = avail.begin();
+
+	while(it != avail.end() && *it != candid.calque_set_index)
+	    ++it;
 	if(it == avail.end())
 	    E_BUG;
 	avail.erase(it);
