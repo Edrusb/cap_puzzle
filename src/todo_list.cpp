@@ -9,6 +9,9 @@ void todo_list::add_work(travail *work, unsigned int level)
 	tmp.work = work;
 	tmp.index = level;
 	todo.push_back(tmp);
+#ifndef NDEBUG
+	show();
+#endif
     }
     catch(...)
     {
@@ -27,10 +30,13 @@ bool todo_list::take_work(travail * & work, unsigned int & level)
     {
 	if(todo.size() > 1)
 	{
-	    work = todo.front().work;
-	    level = todo.front().index;
-	    todo.pop_front();
+	    work = todo.back().work;
+	    level = todo.back().index;
+	    todo.pop_back();
 	    ret = true;
+#ifndef NDEBUG
+	    show();
+#endif
 	}
     }
     catch(...)
@@ -48,7 +54,7 @@ void todo_list::clear()
     todo_mutex.lock();
     try
     {
-	list<indexed_work>::iterator it = todo.begin();
+	deque<indexed_work>::iterator it = todo.begin();
 
 	while(it != todo.end())
 	{
@@ -64,4 +70,9 @@ void todo_list::clear()
 	throw;
     }
     todo_mutex.unlock();
+}
+
+void todo_list::show()
+{
+    cout << "Todo list size = " << todo.size() << endl;
 }

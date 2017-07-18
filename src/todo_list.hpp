@@ -3,7 +3,7 @@
 
 #include "travail.hpp"
 #include <libthreadar/libthreadar.hpp>
-#include <list>
+#include <deque>
 
 using namespace std;
 
@@ -25,7 +25,8 @@ private:
     };
 
     libthreadar::mutex todo_mutex;
-    list<indexed_work> todo;
+    deque<indexed_work> todo;
+    void show();
 };
 
 #endif
