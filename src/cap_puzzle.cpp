@@ -54,7 +54,7 @@ static travail *init_resout(const list<piece> & pi,
     configuration.clear();
     while(it != pi.end())
     {
-	cout << "Recherche des calques pour la piece " << it->get_symbol() << endl;
+	cout << "pre-calculating layers for piece " << it->get_symbol() << endl;
 	cout.flush();
 	configuration.push_back(calque_set(*it, dimx, dimy));
 	it++;
@@ -141,12 +141,12 @@ static void debug_piece(const list<piece> & disponibles)
 static void display_usage(const char *cmd)
 {
     cout << "usage: " << cmd << " <fichier> <num thread>" << endl << endl;
-    cout << "\t syntaxe du fichier attendu :" << endl;
+    cout << "\t syntaxe of expected file:" << endl;
     cout << "\t[dimx, dimy]" << endl;
     cout << "\t(x,y)[S] \n\t 1 0 0 ... \n\t 0 0 1 ... \n\t ... \n\n";
-    cout << "\tdimx et dimy sont les dimensions du tableau\n";
-    cout << "\tx et y sont les dimensions de la piece S son symbole et les 0 et 1 qui suivent sa forme (0 = vide, 1 = plein)\n";
-    cout << "\td'autres pièces peuvent être décrites selon le même schema, on peut insérer des espace ou l'on veut\n";
+    cout << "\tdimx and dimy are the dimensions of the board\n";
+    cout << "\tx and y are the dimensions of the piece \"S\" (its symbol),\n\tand the 0 and 1 that follow define its shape\n\t(0 = empty, 1 = full)\n";
+    cout << "\tother pieces can be added and must be described following\n\tthe same rule, spaces can be inserted for better\n\treadability\n";
 }
 
 static resultat remove_dup(const resultat & solutions)
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 	unsigned int dimx, dimy;
 	const unsigned int team_size = atoi(argv[2]);
 
-	cout  << "Lecture du fichier de configuration..." << endl;
+	cout  << "Reading the configuration file..." << endl;
 	if(!read_from_file(argv[1], disponibles, dimx, dimy))
 	    exit(2);
 	else
@@ -193,12 +193,12 @@ int main(int argc, char *argv[])
 	    vector<robot> workers(team_size);
 
 	    robot::reset_init_flag();
-	    cout << "Configuration correcte" << endl;
+	    cout << "Configuration is correct" << endl;
 	    debug_piece(disponibles);
 
 		// preparation de l'algorithme de recherche
 
-	    display_time("creation des calques ...");
+	    display_time("creating layers...");
 	    travail *work = init_resout(disponibles, dimx, dimy, configuration);
 	    if(work == nullptr)
 		throw E_MEM;
@@ -207,8 +207,8 @@ int main(int argc, char *argv[])
 
 		// recherche
 
-	    cout << "Creation de " << team_size << " thread" << (team_size > 1 ? "s" : "") << endl;
-	    display_time("Debut des recherches de solutions...");
+	    cout << "Launching " << team_size << " thread" << (team_size > 1 ? "s" : "") << endl;
+	    display_time("Searching for all solutions...");
 	    vector<robot>::iterator it = workers.begin();
 	    if(team_size > 1)
 	    {
@@ -243,17 +243,17 @@ int main(int argc, char *argv[])
 
 		// suppression des solutions dupliquees
 
-	    display_time("Suppression des solutions dupliquees ... ");
+	    display_time("Removing duplicated solutions... ");
 	    filtred_solutions = remove_dup(solutions);
-	    display_time("Recherche terminee");
+	    display_time("Research completed");
 
 	    // affichage des solutions
 
-	    cout << solutions.size() << " solutions trouvees (avec duplications)" << endl;
-	    cout << filtred_solutions.size() << " solutions uniques trouvees : " << endl;
+	    cout << solutions.size() << " solutions found (with duplications)" << endl;
+	    cout << filtred_solutions.size() << " unique solution(s) found: " << endl;
 	    display_solutions(filtred_solutions);
 
-	    display_time("Fin du programme.");
+	    display_time("End of execution.");
 	}
     }
     catch(int & e)
@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
     }
     catch(...)
     {
-	cout << "Exception inconnue !!!" << endl;
+	cout << "Unknown exception!!!" << endl;
 	return 126;
     }
 
