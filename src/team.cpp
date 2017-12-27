@@ -6,7 +6,10 @@
 libthreadar::mutex team::instances_control;
 list<team::member *> team::instances;
 bool team::election_started = false;
-bool team::work_provided = false;
+libthreadar::barrier* team::scrutin = nullptr;
+libthreadar::barrier* team::depouille = nullptr;
+unsigned int team::starters = 0;
+libthreadar::freezer team::pending_starters;
 
 team::team()
 {
@@ -17,6 +20,7 @@ team::team()
 	if(me == nullptr)
 	    throw E_MEM;
 	instances.push_back(me);
+	me->status = stopped;
     }
     catch(...)
     {
@@ -49,72 +53,175 @@ team::~team()
     instances_control.unlock();
 }
 
+
 void team::check_delegate(unsigned int index)
 {
     if(election_started) // reading a value out of mutex control, yes, for efficiency
     {
-	instances_control.lock();
-	try
+	election_registering_lock_unlock(index);
+
+	assert(scrutin != nullptr);
+	scrutin->wait();  /// BARRIER
+
+	depouillement_lock();
+
+	assert(depouille != nullptr);
+	depouille->wait(); /// BARRIER for the work to be provided
+
+	ending_unlock();
+    }
+}
+
+bool team::ask_delegation()
+{
+    instances_control.lock();
+    election_started = true;
+    instances_control.unlock();
+
+    check_delegate(0); // we have no work to provide, using 0 as index
+
+    return me->index > 0; // if there is a winner it will set index to 1 after work has been provided
+}
+
+void team::election_registering_lock_unlock(unsigned int index)
+{
+    instances_control.lock();
+    try
+    {
+	list<member *>::iterator it = instances.begin();
+	member *winner_candidate = nullptr;
+	unsigned int lower_index = 0;
+
+	    // updating our fields
+
+	assert(me != nullptr);
+	assert(me->status == running || me->status == stopping);
+	switch(me->status)
 	{
-	    list<member *>::iterator it = instances.begin();
-	    member *winner_candidate = nullptr;
-	    unsigned int lower_index = 0;
+	case newcomer:
+	    E_BUG;
+	case running:
+	    me->status = pending;
+	    break;
+	case pending:
+	    E_BUG;
+	case stopping:
+	    me->status = stopending;
+	    break;
+	case stopending:
+	    E_BUG;
+	case stopped:
+	    E_BUG;
+	default:
+	    E_BUG;
+	}
+	me->index = index;
 
-		// updating our fields
+	    // looking for a winner
 
-	    assert(me != nullptr);
-	    if(!me->dying_or_dead)
-		me->is_pending = true;
-	    me->index = index;
-
-		// looking for a winner
-
-	    while(it != instances.end() && *it != nullptr && ((*it)->is_pending || (*it)->dying_or_dead))
+	while(it != instances.end()
+	      && *it != nullptr
+	      && (*it)->status != running
+	      && (*it)->status != stopping)
+	{
+	    switch((*it)->status)
 	    {
+	    case newcomer:
+	    case stopped:
+		break;
+	    case running:
+	    case stopping:
+		E_BUG;
+	    case pending:
+	    case stopending:
 		if((*it)->index < lower_index
 		   || lower_index == 0)
 		{
 		    lower_index = (*it)->index;
 		    winner_candidate = *it;
 		}
-		++it;
+		break;
+	    default:
+		E_BUG;
 	    }
+	    ++it;
+	}
 
-	    if(it == instances.end()) // the candidate is a real winner
+	if(it == instances.end()) // the candidate is a real winner
+	{
+
+		// looking at election result
+
+	    assert(winner_candidate != nullptr);
+	    winner_candidate->winner = true;
+	}
+    }
+    catch(...)
+    {
+	instances_control.unlock();
+	throw;
+    }
+    instances_control.unlock();
+}
+
+void team::depouillement_lock()
+{
+    if(me->winner)
+    {
+	instances_control.lock();
+	try
+	{
+	    election_started = false;
+
+	    if(me->index > 0) // we can provide a work
 	    {
+		list<member *>::iterator it = instances.begin();
 
-		    // looking at election result
+		    // inherited
+		delegate_work();
 
-		election_started = false;
-		if(lower_index == 0) // no work remain for the team
-		    work_provided = false;
-		else
+		    // and informing requesting thread a work was provided
+		while(it != instances.end())
 		{
-			// informing the winner
-
-		    work_provided = true;
-		    assert(winner_candidate != nullptr);
-		    winner_candidate->winner = true;
-		}
-
-		    // awaking all team members except self unless I am a work requestor
-
-		it = instances.begin();
-		while(it != instances.end() && (*it) != nullptr)
-		{
-		    if((*it) != me             // awake all except me (I am already awaken)
-		       && ((*it)->index > 0    // and do not awake work requestors if...
-			   || !work_provided)) // ...there is a winner to awake them later on
-			(*it)->pending_delegate.unlock();
+		    if(*it != nullptr &&
+		       (*it)->index == 0) // this one was a work requestor
+			(*it)->index = 1; // signaling that a work has been provided
 		    ++it;
 		}
-		if(it != instances.end())
-		    E_BUG;
-
-			// go to sleep only if I am a requestor and a work will be provided
-		if(me->index > 0 || !work_provided)
-		    me->is_pending = false;
 	    }
+
+		// set stopping -> stopped
+		// newcomers -> running
+		// pending -> running
+	    cleanup_instances();
+
+		// awaking the newcomers
+	    assert(pending_starters.get_value() == -starters);
+	    starters = 0;
+	    while(pending_starters.get_value() < 0)
+		pending_starters.unlock();
+
+		// resizing scrutin
+	    resize_barrier(scrutin);
+	}
+	catch(...)
+	{
+	    instances_control.unlock();
+	    throw;
+	}
+
+	    // we do not release instances_control yet!
+    }
+}
+
+void team::ending_unlock()
+{
+    if(me->winner)
+    {
+	try
+	{
+	    resize_barrier(depouille);
+	    me->winner = false;
 	}
 	catch(...)
 	{
@@ -122,61 +229,27 @@ void team::check_delegate(unsigned int index)
 	    throw;
 	}
 	instances_control.unlock();
-
-	if(me->is_pending)
-	    me->pending_delegate.lock();
-
-	if(me->winner)
-	{
-	    delegate_work();
-
-		// awaiking work requestors now that the work delegation is completed
-	    instances_control.lock();
-	    try
-	    {
-		list<member *>::iterator it = instances.begin();
-		me->winner = false;
-		work_provided = false;
-
-		while(it != instances.end() && *it != nullptr)
-		{
-		    if((*it)->index == 0 && (*it)->is_pending)
-		    {
-			(*it)->index = 1; // to inform requestors that a work has been provided
-			(*it)->pending_delegate.unlock();
-		    }
-		    ++it;
-		}
-	    }
-	    catch(...)
-	    {
-		instances_control.unlock();
-		throw;
-	    }
-	    instances_control.unlock();
-	}
-
-	me->is_pending = false;
     }
 }
 
-bool team::ask_delegation()
+void team::first_breath()
 {
+    bool barriers_ok = false;
+
     instances_control.lock();
     try
     {
 	if(!election_started)
 	{
-	    if(work_provided) // election has ended but winner has not yet provided work
-	    {
-		    // we add ourselve to the list of team member the winner will awake once
-		    // work delegation will be done
-		me->is_pending = true;
-		me->index = 0;
-		assert(me->winner == false);
-	    }
-	    else // no election started, or previous election fully completed
-		election_started = true;
+	    me->status = running;
+	    resize_barrier(scrutin);
+	    resize_barrier(depouille);
+	    barriers_ok = true;
+	}
+	else // must wait for the election to end for the barrier to be resized
+	{
+	    ++starters;
+	    me->status = newcomer;
 	}
     }
     catch(...)
@@ -186,22 +259,114 @@ bool team::ask_delegation()
     }
     instances_control.unlock();
 
-    if(me->is_pending)
-    {
-	me->pending_delegate.lock();
-	me->is_pending = false;
-    }
-    else
-	check_delegate(0); // we have no work to provide;
+    if(!barriers_ok)
+	pending_starters.lock();
+}
 
-    return me->index > 0; // if there is a winner it will set it to 1 after work is provided
+void team::last_breath()
+{
+    bool go_check_delegate = false;
+
+    instances_control.lock();
+    try
+    {
+	if(election_started)
+	{
+	    me->status = stopping;
+	    go_check_delegate = true;
+	}
+	else
+	{
+	    me->status = stopped;
+	    resize_barrier(scrutin);
+	    resize_barrier(depouille);
+	}
+    }
+    catch(...)
+    {
+	instances_control.unlock();
+	throw;
+    }
+    instances_control.unlock();
+
+    if(go_check_delegate)
+	check_delegate(0);
 }
 
 void team::inherited_run()
 {
     assert(me != nullptr);
-    me->dying_or_dead = false;
+    first_breath();
     inherited_inherited_run();
-    me->dying_or_dead = true;
-    check_delegate(0);
+    last_breath();
+}
+
+void team::cleanup_instances()
+{
+    list<member *>::iterator it = instances.begin();
+
+    while(it != instances.end())
+    {
+	assert(*it != nullptr);
+	switch((*it)->status)
+	{
+	case newcomer:
+	case pending:
+	    (*it)->status = running;
+	    break;
+	case running:
+	    E_BUG;
+	case stopping:
+	    E_BUG;
+	case stopending:
+	    (*it)->status = stopped;
+	    break;
+	case stopped:
+	    break;
+	default:
+	    E_BUG;
+	}
+	++it;
+    }
+}
+
+void team::resize_barrier(libthreadar::barrier* & val)
+{
+    unsigned int size = 0;
+    list<member *>::iterator it = instances.begin();
+
+	// calculating the new size of the barrier
+
+    while(it != instances.end())
+    {
+	assert(*it != nullptr);
+	switch((*it)->status)
+	{
+	case newcomer:
+	case running:
+	case pending:
+	    ++size;
+	    break;
+	case stopping:
+	case stopending:
+	case stopped:
+	    break;
+	default:
+	    E_BUG;
+	}
+	++it;
+    }
+
+    if(val != nullptr && val->get_count() != size)
+    {
+	delete val;
+	val = nullptr;
+    }
+
+    if(val == nullptr && size > 0)
+    {
+	val = new libthreadar::barrier(size);
+	if(val == nullptr)
+	    throw E_MEM;
+    }
 }

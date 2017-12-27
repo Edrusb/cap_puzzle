@@ -51,34 +51,54 @@ protected:
     virtual void inherited_inherited_run() = 0;
 
 private:
+
+    enum etat
+    {
+	stopped,    //< stopped thread or not yet running
+	newcomer,   //< thread activated during an election process
+	running,    //< normal thread not involved in an election
+	pending,    //< normal thread involved into an election process
+	stopping,   //< thread dying during an election
+	stopending, //< thread dyning involved into an election process
+    };
+
     struct member
     {
 	member()
 	{
-	    is_pending = false;
+	    status = stopped;
 	    index = 0;
 	    winner = false;
-	    pending_delegate.lock();
-	    dying_or_dead = false;
 	};
 
-	bool is_pending;       // is or is about to be suspended on pending_delegate
-	libthreadar::mutex pending_delegate;
+	etat status;           // thread status
 	unsigned int index;    // zero if member has not work to provide
 	bool winner;           // the winner has to provide work
-	bool dying_or_dead;    // whether the thread is dead or about to die
     };
 
     member *me;
 
+    void election_registering_lock_unlock(unsigned int index);
+    void depouillement_lock();
+    void ending_unlock();
+    void first_breath();
+    void last_breath();
 	// moving as private the method inherited from libthreadar::thread
     void inherited_run();
+    void cleanup_instances();
 
+	// static fields and methods
 
     static libthreadar::mutex instances_control;
     static list<member *> instances;
     static bool election_started;
-    static bool work_provided;
+    static libthreadar::barrier* scrutin;
+    static libthreadar::barrier* depouille;
+    static unsigned int starters;
+    static libthreadar::freezer pending_starters;
+
+    static void resize_barrier(libthreadar::barrier* & val);
+
 };
 
 #endif
