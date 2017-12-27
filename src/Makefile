@@ -7,17 +7,17 @@ LDFLAGS = -O3 -std=c++11 -lthreadar
 #CXXFLAGS = -g -std=c++11 -pedantic -pg
 #LDFLAGS = -g -std=c++11 -lthreadar -pg
 
-OBJ=puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o travail.o team.o todo_list.o robot.o resultat.o
+OBJ=cap_puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o travail.o team.o todo_list.o robot.o resultat.o
 
-all: puzzle
+all: cap_puzzle
 
 clean:
-	rm -f *.o puzzle
+	rm -f *.o cap_puzzle
 
-puzzle: $(OBJ)
+cap_puzzle: $(OBJ)
 	$(CXX) $(LDFLAGS) $(OBJ) -o $@
 
-puzzle.cpp : calque_set.hpp pieces.hpp board.hpp travail.hpp
+cap_puzzle.cpp : calque_set.hpp pieces.hpp board.hpp travail.hpp
 calque_set.cpp : calque_set.hpp
 position.cpp: position.hpp
 calque.cpp: calque.hpp
