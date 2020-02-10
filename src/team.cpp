@@ -68,8 +68,7 @@ team::~team()
     }
     catch(...)
     {
-	instances_control.unlock();
-	throw;
+	    // do nothing
     }
     instances_control.unlock();
 }
@@ -378,7 +377,7 @@ void team::resize_barrier(libthreadar::barrier* & val)
 	++it;
     }
 
-    if(val != nullptr && val->get_count() != size)
+    if(val != nullptr)
     {
 	delete val;
 	val = nullptr;
