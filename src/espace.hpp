@@ -40,8 +40,8 @@ public:
     espace(int fd); // read x and y from a plain text file
     espace(const espace & ref) { copy_from(ref); };
     espace(espace && ref) { move_from(std::move(ref)); };
-    espace & operator = (const espace & ref) { detruit(); copy_from(ref); };
-    espace & operator = (espace && ref) { detruit(); move_from(std::move(ref)); };
+    espace & operator = (const espace & ref) { detruit(); copy_from(ref); return *this; };
+    espace & operator = (espace && ref) { detruit(); move_from(std::move(ref)); return *this; };
     ~espace() { detruit(); };
     bool operator == (const espace & ref) const;
 
