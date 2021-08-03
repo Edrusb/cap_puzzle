@@ -19,8 +19,11 @@
 # to contact the author : http:dar.linux.free.fr/email.html
 #######################################################################
 
-CXXFLAGS = -O4 -std=c++11 -DNDEBUG
-LDFLAGS = -O4 -std=c++11 -lthreadar
+# STATIC = -static
+STATIC =
+
+CXXFLAGS = -O4 -std=c++11 -DNDEBUG `pkg-config --cflags libthreadar` $(STATIC)
+LDFLAGS = -O4 -std=c++11 `pkg-config --libs libthreadar`  $(STATIC)
 
 #CXXFLAGS = -O2  -std=c++11 -DNDEBUG
 #LDFLAGS = -O2 -std=c++11 -lthreadar
