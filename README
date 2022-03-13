@@ -42,8 +42,9 @@ IMPLEMENTATION
     center, because it is always more difficult to add
     a new piece at the edge when some are already
     placed at the edge. Only when all cells of the
-    board are filled by a piece that the algorithm
-    consider the next layers of cells toward the center.
+    edge are filled by a piece, the algorithm considers 
+    filling the next layers of cells toward the center
+    that would still be empty.
 
     This way no need to add a lot of piece to find
     that a branch is a dead end.
@@ -104,7 +105,7 @@ USAGE
 
    At end of execution the program displays the
    solution using the letters given in the
-   configuration fine.
+   configuration file.
 
 
 EXAMPLE
