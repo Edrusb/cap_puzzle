@@ -9,7 +9,7 @@
 PRESENTATION
 
     This program has been designed to find all
-    solution of puzzle as the one pictured in
+    solutions of puzzle as the one pictured in
     doc/puzzle.jpg
 
 
@@ -34,7 +34,7 @@ IMPLEMENTATION
     a tree lookup adding a new piece on the board up
     to the time no more piece can be added (dead end
     branch) or all pieces could take place on the board
-    (solution). Nothing clever here but except the
+    (solution). Nothing clever here except maybe the
     way to try adding a new piece:
 
     The algorithm here tries to fill the empty places
@@ -42,12 +42,16 @@ IMPLEMENTATION
     center, because it is always more difficult to add
     a new piece at the edge when some are already
     placed at the edge. Only when all cells of the
-    edge are filled by a piece, the algorithm considers 
+    edge are filled by a piece, the algorithm considers
     filling the next layers of cells toward the center
     that would still be empty.
 
+    If a cell cannot be filled by any still available
+    piece in any possible position/rotation/face, we
+    can prune this branch and step back.
+
     This way no need to add a lot of piece to find
-    that a branch is a dead end.
+    branches that are dead ends.
 
 
 COMPILATION
@@ -98,12 +102,12 @@ USAGE
    have the same letter if you want to be able to
    read the solutions properly.
 
-   once the configuration is set you run the
+   Once the configuration is set, you can run the
    program giving its path as first argument,
    followed by the number of thread to run in
    concurrency to solve the problem.
 
-   At end of execution the program displays the
+   At end of execution, the program displays the
    solution using the letters given in the
    configuration file.
 
