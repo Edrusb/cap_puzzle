@@ -21,15 +21,11 @@
 
 # STATIC = -static
 STATIC =
+CXX_STD=-std=c++11
 
-CXXFLAGS = -O4 -std=c++11 -DNDEBUG `pkg-config --cflags libthreadar` $(STATIC)
-LDFLAGS = -O4 -std=c++11 `pkg-config --libs libthreadar`  $(STATIC)
-
-#CXXFLAGS = -O2  -std=c++11 -DNDEBUG
-#LDFLAGS = -O2 -std=c++11 -lthreadar
-
-#CXXFLAGS = -g -std=c++11 -pedantic -pg
-#LDFLAGS = -g -std=c++11 -lthreadar -pg
+CXXFLAGS = -O4 $(CXX_STD) -DNDEBUG `pkg-config --cflags libthreadar` $(STATIC)
+LDFLAGS = -O4 $(CXX_STD) $(STATIC)
+LIBS=`pkg-config --libs libthreadar`
 
 OBJ=cap_puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o travail.o team.o todo_list.o robot.o resultat.o
 
@@ -39,7 +35,7 @@ clean:
 	rm -f *.o cap_puzzle
 
 cap_puzzle: $(OBJ)
-	$(CXX) $(LDFLAGS) $(OBJ) -o $@
+	$(CXX) $(LDFLAGS) $(OBJ) $(LIBS) -o $@
 
 cap_puzzle.cpp : calque_set.hpp pieces.hpp board.hpp travail.hpp
 calque_set.cpp : calque_set.hpp
