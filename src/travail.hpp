@@ -40,7 +40,7 @@ public:
 	    const vector<calque_set> & config);
 
     bool all_placed() { return avail.size() == 0; };//< vrai si toutes les pieces ont ete placees
-    void find_candidates(deque<candidate> & dispo); //< fournit la liste des candidats possible pour poursuivre la resulution
+    void find_candidates(deque<candidate> & dispo); //< fournit la liste des candidats possible pour poursuivre la resolution
     bool push_candidate(const candidate & candid); //< applique un candidat au travail courant
     void pop_candidate(const candidate & candid);  //< retire un candidat du travail courant
 
