@@ -110,8 +110,16 @@ void robot::delegate_work()
 	tmp = new travail(*work);
 	if(tmp == nullptr)
 	    throw E_MEM;
-	tmp->push_candidate(*it);
-	todo.add_work(tmp, level+1);
+	try
+	{
+	    tmp->push_candidate(*it);
+	    todo.add_work(tmp, level+1);
+	}
+	catch(...)
+	{
+	    delete tmp;
+	    throw;
+	}
 	tmp = nullptr; // object now owned by todo
 	++it;
     }
