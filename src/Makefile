@@ -22,9 +22,12 @@
 # STATIC = -static
 STATIC =
 CXX_STD=-std=c++11
+# OPTIM=-O4 -DNDEBUG
+# OPTIM=-O2 -DNDEBUG
+OPTIM=-ggdb
 
-CXXFLAGS = -O4 $(CXX_STD) -DNDEBUG `pkg-config --cflags libthreadar` $(STATIC)
-LDFLAGS = -O4 $(CXX_STD) $(STATIC)
+CXXFLAGS = $(OPTIM) $(CXX_STD) `pkg-config --cflags libthreadar` $(STATIC)
+LDFLAGS = $(OPTIM) $(CXX_STD) $(STATIC)
 LIBS=`pkg-config --libs libthreadar`
 
 OBJ=cap_puzzle.o calque_set.o position.o calque.o pieces.o rotation.o board.o fd_tools.o travail.o team.o todo_list.o robot.o resultat.o
