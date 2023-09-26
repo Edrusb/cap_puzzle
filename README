@@ -56,12 +56,19 @@ IMPLEMENTATION
 
 COMPILATION
 
-   check that the src/Makefile suits your needs (in
-   particular concerning the optimization options).
-   Then:
+   Cap_puzzle relies on libthreadar
 
-   cd src
-   make
+   	      https://github.com/Edrusb/libthreadar
+
+   It is used to handle parallelism (multi-threading)
+   and inter-thread communications and synchronization.
+   This library is assumed to be installed on the system.
+
+   Next, check that the src/Makefile suits your needs (in
+   particular concerning the optimization options), then:
+
+      cd src
+      make
 
    this will produce a binary file called cap_puzzle.
 
