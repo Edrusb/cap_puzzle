@@ -119,8 +119,8 @@ configuration file.
 
 the configuration file [puzzle.cfg](config/puzzle.cfg) provides
 a description of the puzzle pictured in
-[puzzle.jpg](doc/puzzle.jpg). You can find the different
-soluitions it has by running
+[puzzle.jpg](doc/puzzle.jpg). The result is produced on stdout is like this [result](results/puzzle.txt)
+where you find for each solution a matrix/board filled with the letters associated to each piece.
 
 > cd src <br>
 > ./cap_puzzle ../config/puzzle.cfg 2 <br>
