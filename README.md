@@ -119,12 +119,16 @@ configuration file.
 
 the configuration file [puzzle.cfg](config/puzzle.cfg) provides
 a description of the puzzle pictured in
-[puzzle.jpg](doc/puzzle.jpg). The result is produced on stdout is like this [result](results/puzzle.txt)
-where you find for each solution a matrix/board filled with the letters associated to each piece.
+[puzzle.jpg](doc/puzzle.jpg). The result is produced on stdout like this [result](results/puzzle.txt), 
+so you may redirect *cap_puzzle* output to a file:
 
-> cd src <br>
-> ./cap_puzzle ../config/puzzle.cfg 2 <br>
+>  cd src <br>
+>  cap_puzzle puzzle.cfg 2 > result.txt
+>
+replace "**2**" by the number of CPU you want to involve
+in this resolution for a faster process. In this output, you will find, for each 
+solution, a matrix/board filled with the letters associated to each piece.
 
-replace "2" by the number of CPU you want to involve
-in this resolution for a faster process.
+
+
 
