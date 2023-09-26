@@ -123,5 +123,5 @@ EXAMPLE
       ./cap_puzzle ../config/puzzle.cfg 2
 
    replace "2" by the number of CPU you want to involve
-   in this resolution for a faster resolution.
+   in this resolution for a faster process.
 
